@@ -20,20 +20,27 @@ type JoinRequestDocument = {
   sessionId: string;
   sessionOwnerId: string;
   status: JoinRequestStatus;
-  createdAt: FirebaseFirestore.FieldValue;
-  updatedAt: FirebaseFirestore.FieldValue;
+  createdAt: FieldValue;
+  updatedAt: FieldValue;
 };
 
 function requireAuth(uid?: string): string {
-  if (!uid) throw new HttpsError('unauthenticated', 'Authentication is required.');
+  if (!uid) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+
   return uid;
+}
+
+function joinRequestId(sessionId: string, requesterId: string) {
+  return `${sessionId}__${requesterId}`;
 }
 
 /**
  * Creates a server-trusted JOIN RUN request.
  *
- * The client is intentionally not allowed to create session membership
- * directly. Membership is granted only after the session owner accepts.
+ * The deterministic document ID makes retries idempotent and avoids requiring
+ * a composite query/index just to detect duplicate pending requests.
  */
 export const requestJoinRun = onCall(
   { enforceAppCheck: true, region: 'us-central1' },
@@ -65,19 +72,18 @@ export const requestJoinRun = onCall(
     }
 
     if (session.visibility !== 'joinable') {
-      throw new HttpsError('permission-denied', 'This session is not accepting joins.');
+      throw new HttpsError(
+        'permission-denied',
+        'This session is not accepting joins.',
+      );
     }
 
-    const existing = await firestore
-      .collection('joinRequests')
-      .where('requesterId', '==', requesterId)
-      .where('sessionId', '==', sessionId)
-      .where('status', '==', 'requested')
-      .limit(1)
-      .get();
+    const requestId = joinRequestId(sessionId, requesterId);
+    const ref = firestore.collection('joinRequests').doc(requestId);
+    const existing = await ref.get();
 
-    if (!existing.empty) {
-      return { requestId: existing.docs[0].id, status: 'requested' };
+    if (existing.exists && existing.data()?.status === 'requested') {
+      return { requestId, status: 'requested' };
     }
 
     const document: JoinRequestDocument = {
@@ -89,17 +95,17 @@ export const requestJoinRun = onCall(
       updatedAt: FieldValue.serverTimestamp(),
     };
 
-    const ref = await firestore.collection('joinRequests').add(document);
+    await ref.set(document);
 
-    return { requestId: ref.id, status: 'requested' };
+    return { requestId, status: 'requested' };
   },
 );
 
 /**
  * Accepts or declines a JOIN RUN request.
  *
- * Accepting the request creates RTDB session membership. That membership is
- * what unlocks session-scoped precise live location through Security Rules.
+ * Accepting creates server-controlled RTDB membership. Membership is what
+ * unlocks session-scoped precise location through Security Rules.
  */
 export const respondToJoinRun = onCall(
   { enforceAppCheck: true, region: 'us-central1' },
@@ -130,11 +136,17 @@ export const respondToJoinRun = onCall(
     };
 
     if (joinRequest.sessionOwnerId !== ownerId) {
-      throw new HttpsError('permission-denied', 'Only the session owner can respond.');
+      throw new HttpsError(
+        'permission-denied',
+        'Only the session owner can respond.',
+      );
     }
 
     if (joinRequest.status !== 'requested') {
-      throw new HttpsError('failed-precondition', 'Join request is no longer pending.');
+      throw new HttpsError(
+        'failed-precondition',
+        'Join request is no longer pending.',
+      );
     }
 
     await ref.update({
@@ -143,13 +155,11 @@ export const respondToJoinRun = onCall(
     });
 
     if (decision === 'accepted') {
-      const memberUpdates: Record<string, boolean> = {};
-      memberUpdates[`sessionMembers/${joinRequest.sessionId}/${ownerId}`] = true;
-      memberUpdates[
-        `sessionMembers/${joinRequest.sessionId}/${joinRequest.requesterId}`
-      ] = true;
-
-      await realtime.ref().update(memberUpdates);
+      await realtime.ref().update({
+        [`sessionMembers/${joinRequest.sessionId}/${ownerId}`]: true,
+        [`sessionMembers/${joinRequest.sessionId}/${joinRequest.requesterId}`]:
+          true,
+      });
     }
 
     return { requestId, status: decision };
@@ -166,11 +176,11 @@ export const leaveLiveSession = onCall(
       throw new HttpsError('invalid-argument', 'sessionId is required.');
     }
 
-    const sessionOwnerId = (
+    const ownerId = (
       await realtime.ref(`liveSessions/${sessionId}/ownerId`).get()
     ).val();
 
-    if (sessionOwnerId === uid) {
+    if (ownerId === uid) {
       throw new HttpsError(
         'failed-precondition',
         'The owner must end the session instead of leaving it.',
@@ -183,5 +193,37 @@ export const leaveLiveSession = onCall(
     });
 
     return { sessionId, left: true };
+  },
+);
+
+export const endLiveSession = onCall(
+  { enforceAppCheck: true, region: 'us-central1' },
+  async (request) => {
+    const uid = requireAuth(request.auth?.uid);
+    const sessionId = String(request.data?.sessionId ?? '');
+
+    if (!sessionId) {
+      throw new HttpsError('invalid-argument', 'sessionId is required.');
+    }
+
+    const ownerId = (
+      await realtime.ref(`liveSessions/${sessionId}/ownerId`).get()
+    ).val();
+
+    if (ownerId !== uid) {
+      throw new HttpsError(
+        'permission-denied',
+        'Only the session owner can end this session.',
+      );
+    }
+
+    await realtime.ref().update({
+      [`liveSessions/${sessionId}`]: null,
+      [`sessionMembers/${sessionId}`]: null,
+      [`preciseSessionLocation/${sessionId}`]: null,
+      [`presence/${uid}`]: null,
+    });
+
+    return { sessionId, ended: true };
   },
 );
