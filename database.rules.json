@@ -12,7 +12,15 @@
       "$sessionId": {
         ".read": "auth != null",
         ".write": "auth != null && ((!data.exists() && newData.child('ownerId').val() === auth.uid) || (data.exists() && data.child('ownerId').val() === auth.uid))",
-        ".validate": "newData.hasChildren(['ownerId','visibility','activityType','startedAt'])"
+        ".validate": "!newData.exists() || newData.hasChildren(['ownerId','visibility','activityType','startedAt'])"
+      }
+    },
+
+    "coarseSessionLocation": {
+      "$sessionId": {
+        ".read": "auth != null",
+        ".write": "auth != null && root.child('liveSessions').child($sessionId).child('ownerId').val() === auth.uid",
+        ".validate": "!newData.exists() || newData.hasChildren(['latitude','longitude','updatedAt'])"
       }
     },
 
@@ -28,7 +36,7 @@
         ".read": "auth != null && (root.child('liveSessions').child($sessionId).child('ownerId').val() === auth.uid || root.child('sessionMembers').child($sessionId).child(auth.uid).val() === true)",
         "$uid": {
           ".write": "auth != null && auth.uid === $uid && (root.child('liveSessions').child($sessionId).child('ownerId').val() === auth.uid || root.child('sessionMembers').child($sessionId).child(auth.uid).val() === true)",
-          ".validate": "newData.hasChildren(['latitude','longitude','updatedAt'])"
+          ".validate": "!newData.exists() || newData.hasChildren(['latitude','longitude','updatedAt'])"
         }
       }
     }
