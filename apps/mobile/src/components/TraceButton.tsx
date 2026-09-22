@@ -4,13 +4,16 @@ import {
   StyleSheet,
   Text,
   type PressableProps,
+  type StyleProp,
+  type ViewStyle,
 } from 'react-native';
 
 import { colors } from '../theme/tokens';
 
 type Props = PropsWithChildren<
-  PressableProps & {
+  Omit<PressableProps, 'style'> & {
     tone?: 'primary' | 'secondary';
+    style?: StyleProp<ViewStyle>;
   }
 >;
 
@@ -27,7 +30,7 @@ export function TraceButton({
         styles.base,
         tone === 'primary' ? styles.primary : styles.secondary,
         pressed && styles.pressed,
-        typeof style === 'function' ? style({ pressed }) : style,
+        style,
       ]}
     >
       <Text
