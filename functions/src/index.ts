@@ -32,6 +32,19 @@ function requireAuth(uid?: string): string {
   return uid;
 }
 
+function requireSocialIdentity(request: {
+  auth?: { token?: Record<string, any> } | null;
+}) {
+  const signInProvider = request.auth?.token?.firebase?.sign_in_provider;
+
+  if (signInProvider === 'anonymous') {
+    throw new HttpsError(
+      'permission-denied',
+      'Anonymous beta identities cannot use social live features.',
+    );
+  }
+}
+
 function joinRequestId(sessionId: string, requesterId: string) {
   return `${sessionId}__${requesterId}`;
 }
@@ -46,6 +59,7 @@ export const requestJoinRun = onCall(
   { enforceAppCheck: true, region: 'us-central1' },
   async (request) => {
     const requesterId = requireAuth(request.auth?.uid);
+    requireSocialIdentity(request);
     const sessionId = String(request.data?.sessionId ?? '');
 
     if (!sessionId) {
@@ -225,5 +239,121 @@ export const endLiveSession = onCall(
     });
 
     return { sessionId, ended: true };
+  },
+);
+
+
+type FinalizeActivityInput = {
+  localId?: unknown;
+  activityType?: unknown;
+  startedAtMs?: unknown;
+  finishedAtMs?: unknown;
+  durationSec?: unknown;
+  distanceM?: unknown;
+  averagePaceSecPerKm?: unknown;
+  elevationGainM?: unknown;
+  sampleCount?: unknown;
+  routePath?: unknown;
+};
+
+function requireFiniteNumber(
+  value: unknown,
+  field: string,
+  minimum = 0,
+): number {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed) || parsed < minimum) {
+    throw new HttpsError(
+      'invalid-argument',
+      `${field} must be a finite number >= ${minimum}.`,
+    );
+  }
+
+  return parsed;
+}
+
+export const finalizeActivity = onCall(
+  { enforceAppCheck: true, region: 'us-central1' },
+  async (request) => {
+    const uid = requireAuth(request.auth?.uid);
+    const input = (request.data ?? {}) as FinalizeActivityInput;
+
+    const localId = String(input.localId ?? '');
+    const activityType = String(input.activityType ?? '');
+    const routePath = String(input.routePath ?? '');
+
+    if (!/^activity-[0-9]+$/.test(localId)) {
+      throw new HttpsError('invalid-argument', 'Invalid local activity id.');
+    }
+
+    if (!['run', 'walk', 'ride'].includes(activityType)) {
+      throw new HttpsError('invalid-argument', 'Invalid activity type.');
+    }
+
+    const requiredRoutePrefix = `users/${uid}/activities/${localId}/`;
+
+    if (!routePath.startsWith(requiredRoutePrefix)) {
+      throw new HttpsError(
+        'permission-denied',
+        'Route artifact must belong to the authenticated user.',
+      );
+    }
+
+    const startedAtMs = requireFiniteNumber(input.startedAtMs, 'startedAtMs', 1);
+    const finishedAtMs = requireFiniteNumber(
+      input.finishedAtMs,
+      'finishedAtMs',
+      startedAtMs,
+    );
+    const durationSec = requireFiniteNumber(input.durationSec, 'durationSec');
+    const distanceM = requireFiniteNumber(input.distanceM, 'distanceM');
+    const elevationGainM = requireFiniteNumber(
+      input.elevationGainM,
+      'elevationGainM',
+    );
+    const sampleCount = requireFiniteNumber(input.sampleCount, 'sampleCount');
+
+    const averagePaceSecPerKm =
+      input.averagePaceSecPerKm == null
+        ? null
+        : requireFiniteNumber(
+            input.averagePaceSecPerKm,
+            'averagePaceSecPerKm',
+          );
+
+    if (finishedAtMs - startedAtMs > 48 * 60 * 60 * 1000) {
+      throw new HttpsError(
+        'invalid-argument',
+        'Activity duration exceeds the accepted beta limit.',
+      );
+    }
+
+    const activityId = `${uid}__${localId}`;
+    const ref = firestore.collection('activities').doc(activityId);
+    const existing = await ref.get();
+
+    if (existing.exists) {
+      return { activityId, created: false };
+    }
+
+    await ref.create({
+      ownerId: uid,
+      activityType,
+      startedAt: new Date(startedAtMs),
+      finishedAt: new Date(finishedAtMs),
+      durationSec,
+      distanceM,
+      averagePaceSecPerKm,
+      elevationGainM,
+      sampleCount,
+      routeRef: routePath,
+      privacy: 'private',
+      createdAt: FieldValue.serverTimestamp(),
+      source: 'trace-mobile',
+      schemaVersion: 1,
+    });
+
+    return { activityId, created: true };
   },
 );
