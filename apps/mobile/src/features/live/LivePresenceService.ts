@@ -1,4 +1,5 @@
-import type { Coordinate } from '../../../../packages/shared/src/geo';
+import type { Coordinate } from '@trace/shared';
+
 import type { ActivityKind } from '../activity/session/ActivitySessionMachine';
 
 export type LiveVisibility =
@@ -19,10 +20,10 @@ export type LivePresenceUpdate = {
  * Realtime transport boundary.
  *
  * Implementations should:
- * - publish only coarse position to public presence;
+ * - publish only coarse position to public discovery;
  * - publish exact position only under a session-scoped protected path;
  * - attach server timestamps / TTL-friendly updatedAt values;
- * - remove presence on disconnect when possible.
+ * - remove live presence on disconnect when possible.
  */
 export interface LivePresenceService {
   start(update: LivePresenceUpdate): Promise<void>;
