@@ -1,39 +1,109 @@
-import type { ActiveActivity } from '../activity/tracking/ActivityRecorder';
+import { getAuth } from '@react-native-firebase/auth';
+import {
+  getFunctions,
+  httpsCallable,
+} from '@react-native-firebase/functions';
+import {
+  getStorage,
+  ref as storageRef,
+  uploadString,
+} from '@react-native-firebase/storage';
+import { computeActivityMetrics } from '@trace/shared';
 
-export type ActivityUpload = {
+import { activityStore } from '../activity/storage/SqliteActivityStore';
+import type { PendingActivity } from '../activity/storage/ActivityStore';
+import { createRouteArtifact } from './routeArtifact';
+
+type FinalizeActivityRequest = {
   localId: string;
-  summary: {
-    activityType: ActiveActivity['activityType'];
-    startedAt: number;
-    finishedAt: number;
-    sampleCount: number;
-  };
-  route: ActiveActivity['samples'];
+  activityType: PendingActivity['activityType'];
+  startedAtMs: number;
+  finishedAtMs: number;
+  durationSec: number;
+  distanceM: number;
+  averagePaceSecPerKm: number | null;
+  elevationGainM: number;
+  sampleCount: number;
+  routePath: string;
 };
 
-/**
- * Sync boundary for finished activities.
- *
- * Production flow:
- * 1. read pending activity from local DB;
- * 2. create an idempotency key from localId;
- * 3. upload compressed route artifact;
- * 4. call a trusted Cloud Function to finalize Firestore summary;
- * 5. mark local row as synced only after server acknowledgement.
- */
-export async function syncPendingActivity(activity: ActiveActivity): Promise<ActivityUpload> {
-  if (activity.status !== 'pending_sync') {
-    throw new Error('Only finished activities can be synced');
+type FinalizeActivityResponse = {
+  activityId: string;
+  created: boolean;
+};
+
+export type SyncResult =
+  | {
+      localId: string;
+      status: 'synced';
+      activityId: string;
+    }
+  | {
+      localId: string;
+      status: 'failed';
+      error: string;
+    };
+
+export async function syncAllPendingActivities(): Promise<SyncResult[]> {
+  const user = getAuth().currentUser;
+  if (!user) return [];
+
+  const pending = await activityStore.listPendingSync();
+  const results: SyncResult[] = [];
+
+  for (const activity of pending) {
+    try {
+      const metrics = computeActivityMetrics(activity.samples);
+      const routePath =
+        `users/${user.uid}/activities/${activity.localId}/route.json`;
+
+      const artifact = JSON.stringify(createRouteArtifact(activity));
+      const routeReference = storageRef(getStorage(), routePath);
+
+      await uploadString(routeReference, artifact, 'raw', {
+        contentType: 'application/json',
+        cacheControl: 'private,max-age=31536000,immutable',
+      });
+
+      const finalize = httpsCallable<
+        FinalizeActivityRequest,
+        FinalizeActivityResponse
+      >(getFunctions(), 'finalizeActivity');
+
+      const response = await finalize({
+        localId: activity.localId,
+        activityType: activity.activityType,
+        startedAtMs: activity.startedAt,
+        finishedAtMs: activity.finishedAt,
+        durationSec: metrics.durationSec,
+        distanceM: metrics.distanceM,
+        averagePaceSecPerKm: metrics.averagePaceSecPerKm,
+        elevationGainM: metrics.elevationGainM,
+        sampleCount: activity.samples.length,
+        routePath,
+      });
+
+      await activityStore.markSynced(
+        activity.localId,
+        response.data.activityId,
+      );
+
+      results.push({
+        localId: activity.localId,
+        status: 'synced',
+        activityId: response.data.activityId,
+      });
+    } catch (cause) {
+      results.push({
+        localId: activity.localId,
+        status: 'failed',
+        error:
+          cause instanceof Error
+            ? cause.message
+            : 'Unknown activity sync error',
+      });
+    }
   }
 
-  return {
-    localId: activity.localId,
-    summary: {
-      activityType: activity.activityType,
-      startedAt: activity.startedAt,
-      finishedAt: activity.samples.at(-1)?.timestamp ?? Date.now(),
-      sampleCount: activity.samples.length,
-    },
-    route: activity.samples,
-  };
+  return results;
 }
