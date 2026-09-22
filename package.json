@@ -1,0 +1,15 @@
+{
+  "name": "trace",
+  "private": true,
+  "version": "0.1.0",
+  "description": "TRACE — Firebase-first live movement network",
+  "workspaces": [
+    "apps/*",
+    "functions",
+    "packages/*"
+  ],
+  "scripts": {
+    "firebase:emulators": "firebase emulators:start",
+    "firebase:deploy:rules": "firebase deploy --only firestore:rules,database,storage"
+  }
+}
