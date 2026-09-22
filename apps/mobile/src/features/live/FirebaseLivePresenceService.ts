@@ -17,19 +17,29 @@ import type {
 
 const database = getDatabase();
 
-function requireCurrentUid() {
-  const uid = getAuth().currentUser?.uid;
+function requireCurrentUser() {
+  const user = getAuth().currentUser;
 
-  if (!uid) {
-    throw new Error('Authentication is required before publishing live presence.');
+  if (!user) {
+    throw new Error(
+      'Authentication is required before publishing live presence.',
+    );
   }
 
-  return uid;
+  return user;
 }
 
 export class FirebaseLivePresenceService implements LivePresenceService {
   async start(payload: LivePresenceUpdate) {
-    const uid = requireCurrentUid();
+    const user = requireCurrentUser();
+
+    if (user.isAnonymous && payload.visibility !== 'private') {
+      throw new Error(
+        'Create a verified TRACE profile before becoming publicly discoverable.',
+      );
+    }
+
+    const uid = user.uid;
     const coarse = coarsenCoordinate(payload.coordinate, 300);
 
     const sessionRef = ref(database, `liveSessions/${payload.sessionId}`);
@@ -73,7 +83,15 @@ export class FirebaseLivePresenceService implements LivePresenceService {
   }
 
   async update(payload: LivePresenceUpdate) {
-    const uid = requireCurrentUid();
+    const user = requireCurrentUser();
+
+    if (user.isAnonymous && payload.visibility !== 'private') {
+      throw new Error(
+        'Anonymous beta identities cannot publish social live presence.',
+      );
+    }
+
+    const uid = user.uid;
     const coarse = coarsenCoordinate(payload.coordinate, 300);
 
     await update(ref(database), {
@@ -92,7 +110,7 @@ export class FirebaseLivePresenceService implements LivePresenceService {
   }
 
   async stop(sessionId: string) {
-    const uid = requireCurrentUid();
+    const uid = requireCurrentUser().uid;
 
     await Promise.all([
       remove(ref(database, `liveSessions/${sessionId}`)),
