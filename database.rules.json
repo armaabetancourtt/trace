@@ -11,7 +11,7 @@
     "liveSessions": {
       "$sessionId": {
         ".read": "auth != null",
-        ".write": "auth != null && ((!data.exists() && newData.child('ownerId').val() === auth.uid) || (data.exists() && data.child('ownerId').val() === auth.uid))",
+        ".write": "auth != null && (((!data.exists() && newData.child('ownerId').val() === auth.uid) || (data.exists() && data.child('ownerId').val() === auth.uid)) && (!newData.exists() || newData.child('visibility').val() === 'private' || auth.token.firebase.sign_in_provider !== 'anonymous'))",
         ".validate": "!newData.exists() || newData.hasChildren(['ownerId','visibility','activityType','startedAt'])"
       }
     },
