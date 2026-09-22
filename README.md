@@ -233,8 +233,42 @@ Potential models:
 
 No public model-performance claims should be made until they are measured on real held-out data.
 
+
+
+## Run the mobile app
+
+TRACE uses **Expo SDK 57 / React Native 0.86** with a custom development client. Mapbox and React Native Firebase include native code, so **Expo Go is not supported for this project**.
+
+```bash
+git clone https://github.com/armaabetancourtt/trace.git
+cd trace
+npm install
+cp .env.example .env
+```
+
+Then configure a Mapbox public token and the native Firebase app files before generating the iOS/Android projects.
+
+Full setup: [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md).
+
+## Current implementation
+
+The repository now contains working product foundations rather than only architecture documents:
+
+- fullscreen live-map mobile shell;
+- RUN / WALK / RIDE recording flow;
+- background location task;
+- SQLite-backed offline activity persistence;
+- activity state machine with pause/resume/finish;
+- route, distance, pace, duration and elevation primitives;
+- explainable pacer ranking;
+- JOIN RUN interception baseline;
+- Firebase callable JOIN RUN trust flow;
+- coarse-public vs. session-scoped precise location separation.
+
+The next milestone is live discovery + authenticated user onboarding, followed by post-activity TRACE Intelligence.
+
 ## Status
 
-**Foundation phase.** Architecture, privacy model, Firebase rules, offline tracking primitives and realtime domain types are being built first. Product UI and end-to-end Firebase integration follow on top of these foundations.
+**Mobile foundation is implemented.** The repository now includes the native-capable React Native shell, Mapbox UI, background recording, SQLite persistence, Firebase security boundaries and the first JOIN RUN server flow. Real Firebase project credentials and live user discovery are intentionally not fabricated in source control.
 
 **Strava tells you what happened. TRACE shows you what is happening.**
