@@ -1,8 +1,13 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
 
     match /users/{uid} {
       allow read: if signedIn();
@@ -10,22 +15,27 @@ service cloud.firestore {
     }
 
     match /activities/{activityId} {
-      allow create: if signedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow create: if signedIn() &&
+        request.resource.data.ownerId == request.auth.uid;
+
       allow read: if signedIn() && (
         resource.data.ownerId == request.auth.uid ||
         resource.data.privacy == 'public'
       );
-      allow update, delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+
+      allow update, delete: if signedIn() &&
+        resource.data.ownerId == request.auth.uid;
     }
 
+    // JOIN RUN transitions are server-owned. Cloud Functions uses the Admin
+    // SDK, which bypasses client Security Rules after validating auth/state.
     match /joinRequests/{requestId} {
       allow read: if signedIn() && (
         resource.data.requesterId == request.auth.uid ||
         resource.data.sessionOwnerId == request.auth.uid
       );
-      allow create: if signedIn() && request.resource.data.requesterId == request.auth.uid;
-      allow update: if false;
-      allow delete: if false;
+
+      allow create, update, delete: if false;
     }
   }
 }
