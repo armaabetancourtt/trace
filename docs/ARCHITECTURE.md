@@ -44,22 +44,41 @@ Use for highly dynamic state:
 - active session presence;
 - coarse location cells;
 - session participant membership;
+- precise session location after acceptance;
 - live pace/status;
 - ephemeral pacer availability.
 
-TTL/cleanup logic should remove stale live sessions.
-
 ### Cloud Functions
 
-Functions own trusted transitions such as:
+Sensitive state transitions run through callable Functions with Auth and App Check:
 
-- accepting join requests;
+- create JOIN RUN requests;
+- accept/decline JOIN RUN requests;
+- grant/revoke session membership;
 - fan-out notifications;
-- finalizing an activity summary;
-- computing derived metrics;
-- matching pacer candidates;
-- cleaning stale presence;
-- validating privileged writes.
+- finalize activity summaries;
+- compute derived metrics;
+- clean stale presence.
+
+## JOIN RUN trust boundary
+
+```mermaid
+sequenceDiagram
+  participant J as Joining runner
+  participant F as Cloud Function
+  participant O as Session owner
+  participant DB as Firebase
+  participant L as Precise live location
+
+  J->>F: requestJoinRun(sessionId)
+  F->>DB: create join request
+  O->>F: respondToJoinRun(accepted)
+  F->>DB: create session membership
+  DB-->>J: membership now authorized
+  J->>L: read session-scoped precise locations
+```
+
+A client cannot directly add itself to `sessionMembers`. Firebase Admin inside Cloud Functions performs the trusted membership write.
 
 ## Route storage
 
@@ -75,9 +94,20 @@ This avoids thousands of permanent Firestore documents per activity.
 
 ## Realtime privacy boundary
 
-Public discovery should use a coarse geospatial cell/geohash rather than exact coordinates.
+Public discovery uses coarse location rather than exact coordinates.
 
-Exact location can be placed in a session-scoped path only after an accepted join/share relationship.
+Exact location is stored under a session-scoped path. Realtime Database rules only allow reading that path when the caller owns the session or has server-granted membership.
+
+## Interception engine
+
+The first implementation is deliberately deterministic:
+
+1. walk the remaining route;
+2. estimate runner ETA at future points;
+3. estimate joiner ETA;
+4. choose a point minimizing late arrival.
+
+The baseline lives in `packages/shared/src/interception.ts`. A later version can replace straight-line joiner distance with Mapbox pedestrian routing.
 
 ## Future ML
 
