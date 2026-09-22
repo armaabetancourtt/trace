@@ -1,6 +1,7 @@
 .env
 .env.*
 !.env.example
+
 node_modules/
 .expo/
 .firebase/
@@ -9,3 +10,12 @@ node_modules/
 coverage/
 dist/
 build/
+
+# Continuous Native Generation output
+apps/mobile/android/
+apps/mobile/ios/
+
+# Native Firebase app registration files.
+# Add intentionally when a public Firebase project is ready.
+apps/mobile/google-services.json
+apps/mobile/GoogleService-Info.plist
