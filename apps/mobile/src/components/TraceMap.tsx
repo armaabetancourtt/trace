@@ -3,13 +3,14 @@ import { StyleSheet, View } from 'react-native';
 import Mapbox, {
   Camera,
   LineLayer,
+  LocationPuck,
   MapView,
   ShapeSource,
-  LocationPuck,
 } from '@rnmapbox/maps';
 import type { Coordinate } from '@trace/shared';
 
 const token = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
+
 if (token) {
   Mapbox.setAccessToken(token);
 }
@@ -23,19 +24,20 @@ export function TraceMap({
 }) {
   useEffect(() => {
     Mapbox.locationManager.start();
+
     return () => {
       Mapbox.locationManager.stop();
     };
   }, []);
 
-  const routeShape = useMemo<GeoJSON.Feature<GeoJSON.LineString> | null>(() => {
+  const routeShape = useMemo(() => {
     if (!route || route.length < 2) return null;
 
     return {
-      type: 'Feature',
+      type: 'Feature' as const,
       properties: {},
       geometry: {
-        type: 'LineString',
+        type: 'LineString' as const,
         coordinates: route.map((point) => [
           point.longitude,
           point.latitude,
@@ -62,11 +64,13 @@ export function TraceMap({
         animationMode="flyTo"
         animationDuration={500}
       />
+
       <LocationPuck
         puckBearingEnabled
         puckBearing="heading"
         pulsing={{ isEnabled: true }}
       />
+
       {routeShape ? (
         <ShapeSource id="activity-route-source" shape={routeShape}>
           <LineLayer
