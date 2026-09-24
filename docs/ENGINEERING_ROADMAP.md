@@ -1,3 +1,5 @@
+<p align="center"><img src="../brand/trace-banner.svg" alt="TRACE official wordmark" width="680" /></p>
+
 # Engineering Roadmap
 
 ## Phase 1 — Foundation
