@@ -1,10 +1,11 @@
 export const colors = {
   black: '#050505',
-  surface: '#0B0B0B',
-  offWhite: '#F4F3EF',
-  softGray: '#929292',
-  line: '#242424',
-  live: '#B7FF3C',
+  surface: '#101010',
+  primary: '#FFFFFF',
+  offWhite: '#FFFFFF',
+  softGray: '#A0A0A0',
+  line: '#292929',
+  live: '#B7FF3C', // Functional live/recording signal, not a brand CTA color.
 };
 
 export const spacing = {
