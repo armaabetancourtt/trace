@@ -11,6 +11,7 @@ The source of truth is the approved TRACE artwork. The wordmark is a **geometric
 | [Official wordmark](trace-wordmark.svg) | Transparent white vector wordmark for dark backgrounds |
 | [README banner](trace-banner.svg) | Signature black-and-white GitHub hero |
 | [T monogram](trace-icon.svg) | Compact mark derived from the original T; suitable for small square contexts |
+| [Native launcher](trace-launcher.png) | 1024 × 1024 monochrome PNG for Expo's app icon |
 
 The vectors were traced from the supplied approved logo to make the art reusable in source control. Keep proportions and letterforms intact.
 
