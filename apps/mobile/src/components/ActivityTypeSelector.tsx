@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   },
   activeOption: {
     borderBottomWidth: 2,
-    borderBottomColor: colors.live,
+    borderBottomColor: colors.primary,
   },
   label: {
     color: colors.softGray,
