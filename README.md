@@ -1,14 +1,34 @@
-# TRACE — Live Movement Network
+<p align="center"><img src="brand/trace-banner.svg" alt="Official TRACE wordmark — MOVE WITH THE CITY" width="100%" /></p>
 
-[English](README.md) · [Español](README.es.md)
+<p align="center"><strong>A live movement network.</strong><br /><sub>MOVE WITH THE CITY.</sub></p>
 
-> **MOVE WITH THE CITY.**  
-> TRACE is a mobile running and movement platform built around a simple idea: **see movement happening around you, then join it.**
+<p align="center"><a href="README.md">English</a> · <a href="README.es.md">Español</a></p>
 
-![React Native](https://img.shields.io/badge/React_Native-TypeScript-20232A?logo=react&logoColor=61DAFB)
-![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore%20%7C%20Realtime_DB%20%7C%20Functions-FFCA28?logo=firebase&logoColor=black)
-![Mapbox](https://img.shields.io/badge/Mapbox-Geospatial-000000?logo=mapbox&logoColor=white)
-![Privacy](https://img.shields.io/badge/Privacy-Location_Safe-111111)
+<p align="center">
+  <img alt="React Native / TypeScript" src="https://img.shields.io/badge/React_Native-TypeScript-FFFFFF?style=flat-square&labelColor=050505&logo=react&logoColor=white" />
+  <img alt="Firebase" src="https://img.shields.io/badge/Firebase-Backend-FFFFFF?style=flat-square&labelColor=050505&logo=firebase&logoColor=white" />
+  <img alt="Mapbox" src="https://img.shields.io/badge/Mapbox-Geospatial-FFFFFF?style=flat-square&labelColor=050505&logo=mapbox&logoColor=white" />
+  <img alt="Mobile foundation" src="https://img.shields.io/badge/STATUS-MOBILE_FOUNDATION-FFFFFF?style=flat-square&labelColor=050505" />
+</p>
+
+<p align="center"><a href="#the-product">The product</a> · <a href="#firebase-first-architecture">Architecture</a> · <a href="#privacy--safety-by-design">Privacy</a> · <a href="#official-brand-identity">Brand identity</a></p>
+
+---
+
+> **MOVE WITH THE CITY.** TRACE is built around a simple idea: **see movement happening around you, then join it.** It is a product foundation under active development, not a launched public live-discovery service.
+
+## Official brand identity
+
+The official TRACE mark is **white on black**, with the original geometric lettering and its distinctive open A. The README and mobile shell share the same monochrome system. The lime accent is reserved for **LIVE / recording status** rather than being the brand's primary color.
+
+| Token | Color | Usage |
+| --- | --- | --- |
+| Signature black | `#050505` | App/background |
+| White | `#FFFFFF` | Wordmark, type, primary actions |
+| Surface | `#101010` | Cards and overlays |
+| Live status | `#B7FF3C` | Functional presence and route feedback |
+
+[Official wordmark](brand/trace-wordmark.svg) · [README banner](brand/trace-banner.svg) · [TRACE T icon](brand/trace-icon.svg) · [Brand guidelines](brand/README.md)
 
 ## The product
 
