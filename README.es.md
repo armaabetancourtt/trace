@@ -1,11 +1,34 @@
-# TRACE — Red de Movimiento en Tiempo Real
+<p align="center"><img src="brand/trace-banner.svg" alt="Official TRACE wordmark — MOVE WITH THE CITY" width="100%" /></p>
 
-[English](README.md) · [Español](README.es.md)
+<p align="center"><strong>Una red de movimiento en tiempo real.</strong><br /><sub>MOVE WITH THE CITY.</sub></p>
 
-> **MOVE WITH THE CITY.**  
-> TRACE es una plataforma móvil de running y actividad física construida alrededor de una idea: **ver movimiento ocurriendo cerca de ti y poder unirte.**
+<p align="center"><a href="README.md">English</a> · <a href="README.es.md">Español</a></p>
 
-TRACE no se plantea como un clon de Strava. Su tesis de producto es una **real-time movement network**.
+<p align="center">
+  <img alt="React Native / TypeScript" src="https://img.shields.io/badge/React_Native-TypeScript-FFFFFF?style=flat-square&labelColor=050505&logo=react&logoColor=white" />
+  <img alt="Firebase" src="https://img.shields.io/badge/Firebase-Backend-FFFFFF?style=flat-square&labelColor=050505&logo=firebase&logoColor=white" />
+  <img alt="Mapbox" src="https://img.shields.io/badge/Mapbox-Geospatial-FFFFFF?style=flat-square&labelColor=050505&logo=mapbox&logoColor=white" />
+  <img alt="Mobile foundation" src="https://img.shields.io/badge/STATUS-MOBILE_FOUNDATION-FFFFFF?style=flat-square&labelColor=050505" />
+</p>
+
+<p align="center"><a href="#qué-hace-diferente-a-trace">El producto</a> · <a href="#arquitectura-firebase-first">Arquitectura</a> · <a href="#privacidad">Privacidad</a> · <a href="#identidad-oficial">Identidad</a></p>
+
+---
+
+> **MOVE WITH THE CITY.** TRACE parte de una idea: **ver el movimiento cercano y poder unirte.** Es una base de producto en desarrollo, no un servicio público de descubrimiento en vivo ya lanzado.
+
+## Identidad oficial
+
+El logotipo oficial de TRACE es **blanco sobre negro** y conserva su tipografía geométrica, incluida la A abierta. README y app comparten el mismo lenguaje monocromático. El verde lima se reserva para indicar **LIVE / grabación**, no como color principal de la marca.
+
+| Token | Color | Uso |
+| --- | --- | --- |
+| Negro oficial | `#050505` | Fondo |
+| Blanco | `#FFFFFF` | Logotipo, texto y acciones principales |
+| Superficie | `#101010` | Tarjetas y overlays |
+| Indicador LIVE | `#B7FF3C` | Estado funcional y trazado de rutas |
+
+[Logotipo oficial](brand/trace-wordmark.svg) · [Banner](brand/trace-banner.svg) · [Ícono T](brand/trace-icon.svg) · [Guía de marca](brand/README.md)
 
 ## Qué hace diferente a TRACE
 
