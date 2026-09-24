@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   primary: {
-    backgroundColor: colors.live,
+    backgroundColor: colors.primary,
   },
   secondary: {
     backgroundColor: colors.offWhite,
