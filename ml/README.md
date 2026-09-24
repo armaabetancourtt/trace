@@ -1,3 +1,5 @@
+<p align="center"><img src="../brand/trace-banner.svg" alt="TRACE official wordmark" width="680" /></p>
+
 # TRACE ML roadmap
 
 TRACE will only add models once enough consented, de-identified data exists to evaluate them honestly.
