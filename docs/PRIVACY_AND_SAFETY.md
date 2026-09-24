@@ -1,3 +1,5 @@
+<p align="center"><img src="../brand/trace-banner.svg" alt="TRACE official wordmark" width="680" /></p>
+
 # Privacy & Safety
 
 TRACE is location-first, so safety is part of the architecture rather than a later feature.

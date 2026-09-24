@@ -9,6 +9,7 @@ import {
 import { ActivityTypeSelector } from '../components/ActivityTypeSelector';
 import { TraceButton } from '../components/TraceButton';
 import { TraceMap } from '../components/TraceMap';
+import { TraceWordmark } from '../components/TraceWordmark';
 import type { ActivityKind } from '../features/activity/session/ActivitySessionMachine';
 import { colors } from '../theme/tokens';
 
@@ -26,7 +27,7 @@ export function LiveMapScreen({
       <SafeAreaView pointerEvents="box-none" style={styles.overlay}>
         <View style={styles.topBar}>
           <View>
-            <Text style={styles.brand}>TRACE</Text>
+            <TraceWordmark width={152} />
             <Text style={styles.network}>LIVE MOVEMENT NETWORK</Text>
           </View>
           <View style={styles.livePill}>
@@ -80,12 +81,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
-  brand: {
-    color: colors.offWhite,
-    fontSize: 22,
-    fontWeight: '900',
-    letterSpacing: -0.8,
-  },
   network: {
     marginTop: 4,
     color: colors.softGray,
@@ -122,13 +117,13 @@ const styles = StyleSheet.create({
   panel: {
     marginBottom: 12,
     padding: 20,
-    backgroundColor: 'rgba(5,5,5,0.94)',
+    backgroundColor: 'rgba(5,5,5,0.96)',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#2A2A2A',
+    borderColor: colors.line,
     borderRadius: 12,
   },
   eyebrow: {
-    color: colors.live,
+    color: colors.offWhite,
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 1.8,

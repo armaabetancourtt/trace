@@ -9,6 +9,8 @@ import Mapbox, {
 } from '@rnmapbox/maps';
 import type { Coordinate } from '@trace/shared';
 
+import { colors } from '../theme/tokens';
+
 const token = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 if (token) {
@@ -76,7 +78,7 @@ export function TraceMap({
           <LineLayer
             id="activity-route-line"
             style={{
-              lineColor: '#B7FF3C',
+              lineColor: colors.primary,
               lineWidth: 5,
               lineCap: 'round',
               lineJoin: 'round',
@@ -94,6 +96,6 @@ const styles = StyleSheet.create({
   },
   mapFallback: {
     flex: 1,
-    backgroundColor: '#101010',
+    backgroundColor: colors.surface,
   },
 });

@@ -1,3 +1,5 @@
+<p align="center"><img src="../brand/trace-banner.svg" alt="TRACE official wordmark" width="680" /></p>
+
 # Local development
 
 TRACE mobile uses **Expo SDK 57 + a custom development build**.

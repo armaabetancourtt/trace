@@ -1,0 +1,27 @@
+import Svg, { Path } from 'react-native-svg';
+
+import { colors } from '../theme/tokens';
+
+// The approved custom TRACE letterforms, traced from the official artwork.
+// Keep this path synchronized with brand/trace-wordmark.svg.
+const WORDMARK_PATH = 'M3,4 0,6 0,19 48,19 52,23 52,137 53,141 67,141 67,20 69,18 123,18 123,6 122,4Z M220,4 220,18 298,18 308,22 315,29 319,39 319,51 316,59 309,67 303,70 227,71 220,75 220,141 234,141 234,93 236,85 277,85 317,141 336,141 297,86 312,82 319,78 331,63 334,53 334,35 332,28 326,18 317,10 301,4Z M500,1 495,7 420,141 437,141 499,32 555,138 558,141 574,141Z M705,4 691,9 679,16 662,33 655,46 651,59 650,80 652,91 658,106 666,118 684,133 697,139 709,142 725,143 740,141 760,133 772,124 777,118 765,110 752,121 732,128 712,128 691,120 679,110 669,95 665,81 666,60 669,51 677,38 686,29 705,19 715,17 729,17 739,19 753,25 765,35 775,29 777,26 763,14 743,5 734,3Z M872,4 872,140 971,141 971,127 887,126 888,78 956,77 956,64 888,64 887,19 971,18 971,4Z';
+
+export function TraceWordmark({
+  width = 154,
+  color = colors.offWhite,
+}: {
+  width?: number;
+  color?: string;
+}) {
+  return (
+    <Svg
+      width={width}
+      height={(width * 144) / 972}
+      viewBox="0 0 972 144"
+      accessibilityLabel="TRACE"
+      accessible
+    >
+      <Path d={WORDMARK_PATH} fill={color} fillRule="evenodd" />
+    </Svg>
+  );
+}

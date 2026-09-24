@@ -9,6 +9,7 @@ import {
 
 import { TraceButton } from '../components/TraceButton';
 import { TraceMap } from '../components/TraceMap';
+import { TraceWordmark } from '../components/TraceWordmark';
 import type { ActivityKind } from '../features/activity/session/ActivitySessionMachine';
 import { useActivitySession } from '../features/activity/hooks/useActivitySession';
 import { colors } from '../theme/tokens';
@@ -73,9 +74,12 @@ export function ActivityScreen({
 
       <SafeAreaView pointerEvents="box-none" style={styles.overlay}>
         <View style={styles.top}>
-          <Text style={styles.mode}>
-            {activityType.toUpperCase()} · {paused ? 'PAUSED' : 'RECORDING'}
-          </Text>
+          <View style={styles.brandRow}>
+            <TraceWordmark width={90} />
+            <Text style={styles.mode}>
+              {activityType.toUpperCase()} · {paused ? 'PAUSED' : 'RECORDING'}
+            </Text>
+          </View>
 
           <View style={styles.metrics}>
             <View>
@@ -132,8 +136,12 @@ const styles = StyleSheet.create({
   top: {
     paddingTop: 14,
   },
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   mode: {
-    alignSelf: 'center',
     color: colors.live,
     fontSize: 10,
     fontWeight: '900',
@@ -144,7 +152,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     backgroundColor: 'rgba(5,5,5,0.92)',
-    borderColor: '#272727',
+    borderColor: colors.line,
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 10,
     paddingHorizontal: 18,

@@ -30,6 +30,7 @@ export function TraceButton({
         styles.base,
         tone === 'primary' ? styles.primary : styles.secondary,
         pressed && styles.pressed,
+        props.disabled && styles.disabled,
         style,
       ]}
     >
@@ -54,14 +55,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   primary: {
-    backgroundColor: colors.live,
+    backgroundColor: colors.primary,
   },
   secondary: {
-    backgroundColor: colors.offWhite,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.line,
   },
   pressed: {
     opacity: 0.82,
     transform: [{ scale: 0.99 }],
+  },
+  disabled: {
+    opacity: 0.45,
   },
   label: {
     fontSize: 15,
@@ -72,6 +78,6 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   secondaryLabel: {
-    color: colors.black,
+    color: colors.offWhite,
   },
 });

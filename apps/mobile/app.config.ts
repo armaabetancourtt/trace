@@ -2,10 +2,12 @@ export default {
   expo: {
     name: 'TRACE',
     slug: 'trace',
+    icon: './assets/trace-launcher.png',
     version: '0.1.0',
     orientation: 'portrait',
     scheme: 'trace',
     userInterfaceStyle: 'dark',
+    splash: { backgroundColor: '#050505' },
     newArchEnabled: true,
     ios: {
       supportsTablet: false,
