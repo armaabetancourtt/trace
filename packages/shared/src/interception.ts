@@ -30,7 +30,7 @@ export function estimateInterceptPoint(params: {
   const {
     joinerLocation,
     remainingRoute,
-    activeRunnerLocation = remainingRoute[0],
+    activeRunnerLocation,
     runnerSpeedMps,
     joinerSpeedMps,
     maxLookaheadSec = 30 * 60,
@@ -40,18 +40,19 @@ export function estimateInterceptPoint(params: {
     return null;
   }
 
-  let runnerDistanceM = haversineDistanceM(activeRunnerLocation, remainingRoute[0]);
+  const runnerStart = activeRunnerLocation ?? remainingRoute[0]!;
+  let runnerDistanceM = haversineDistanceM(runnerStart, remainingRoute[0]!);
   let best: InterceptCandidate | null = null;
 
   for (let index = 0; index < remainingRoute.length; index += 1) {
     if (index > 0) {
       runnerDistanceM += haversineDistanceM(
-        remainingRoute[index - 1],
-        remainingRoute[index],
+        remainingRoute[index - 1]!,
+        remainingRoute[index]!,
       );
     }
 
-    const point = remainingRoute[index];
+    const point = remainingRoute[index]!;
     const runnerEtaSec = runnerDistanceM / runnerSpeedMps;
     if (runnerEtaSec > maxLookaheadSec) break;
 
