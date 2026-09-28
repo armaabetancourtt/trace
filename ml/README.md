@@ -1,17 +1,22 @@
-<p align="center"><img src="../brand/trace-banner.svg" alt="TRACE official wordmark" width="680" /></p>
+# TRACE expected-run-pace benchmark
 
-# TRACE ML roadmap
+**Implemented (experimental):** a reproducible Python pipeline for one well-defined prediction task: expected running pace in seconds/km, compared against mean and previous-28-day-pace baselines. It uses a deterministic user-disjoint train/validation/test holdout; model selection is validation-only. Tests use explicitly synthetic fixtures and run in CI.
 
-TRACE will only add models once enough consented, de-identified data exists to evaluate them honestly.
+**Not yet demonstrated:** actual model performance on user-consented data, mobile integration, online inference, or representative predictive quality. Do not treat the tests as empirical performance. This remains a research pipeline until such data are available.
 
-Candidate workstreams:
+## Data contract and consent
 
-- pace prediction;
-- pacer compatibility ranking;
-- route difficulty scoring;
-- activity clustering;
-- training consistency;
-- anomaly detection;
-- personalized challenge ranking.
+Bring your own explicitly opt-in, de-identified CSV, kept outside Git. Required columns: `user_id` (non-reversible random identifier), `started_at` (UTC), `feature_window_end_at` (UTC, strictly earlier than start), `planned_distance_m`, `planned_elevation_gain_m`, `recent_28d_pace_sec_per_km`, `pace_sec_per_km` (observed target). Include completed runs only; never upload raw GPS trajectories or real account identifiers. The prior-28-day pace must be computed using **only activities before each row's start time**; otherwise the model leaks future outcomes. Revoke/delete inputs according to the user's consent. The pipeline requires at least ten consenting users. Supplying an external dataset is an explicit user/operator step: automated fixture tests do not represent a real benchmark.
 
-No model-performance claims belong in the public README until they are measured on real held-out data.
+```bash
+python -m pip install -r ml/requirements.txt
+cd ml
+pytest -q test_pace_benchmark.py
+python pace_benchmark.py --csv /secure/consented_runs.csv --output artifacts
+```
+
+The produced `evaluation.json` contains the dataset byte SHA-256, chosen candidate, validation MAE, held-out test MAE/RMSE and partition sizes. The selected sklearn model (if an ML candidate beats the baseline) is stored as a **trusted local** joblib artifact. Do not load arbitrary joblib files. Neither user data nor results are automatically uploaded. Remaining work: consent collection, historical as-of feature generation, quality checks across runner cohorts, on-device/server inference and integration into TRACE Intelligence. Predictions are guidance, never a health or safety decision.
+
+## As-of validation
+
+The declared historical feature window must end before `started_at`; the loader rejects equal or later timestamps. Both distance and elevation are **planned route features**, available before the run, not observed post-run values. Historical pace provenance is supplied by the dataset operator and cannot be independently proved from an aggregate CSV. No verified end-user outcome or mobile integration is claimed.

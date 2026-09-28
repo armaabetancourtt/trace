@@ -1,5 +1,8 @@
 <p align="center"><img src="brand/trace-banner.svg" alt="Official TRACE wordmark — MOVE WITH THE CITY" width="100%" /></p>
 
+> **ML engineering evidence · experimental:** [user-disjoint pace benchmark](ml/pace_benchmark.py) · [synthetic fixture tests](ml/test_pace_benchmark.py) · [consent/data contract](ml/README.md). Real held-out performance and app integration remain pending opt-in, de-identified data.
+
+
 <p align="center"><strong>A live movement network.</strong><br /><sub>MOVE WITH THE CITY.</sub></p>
 
 <p align="center"><a href="README.md">English</a> · <a href="README.es.md">Español</a></p>
