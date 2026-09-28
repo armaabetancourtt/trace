@@ -11,8 +11,8 @@ def fixture():
     df = pd.DataFrame({
         "user_id": [f"test-{i//6}" for i in range(n)],
         "started_at": pd.date_range("2026-01-01", periods=n, freq="h").astype(str),
-        "distance_m": rng.uniform(1500, 15000, n),
-        "elevation_gain_m": rng.uniform(0, 150, n),
+        "planned_distance_m": rng.uniform(1500, 15000, n),
+        "planned_elevation_gain_m": rng.uniform(0, 150, n),
         "recent_28d_pace_sec_per_km": rng.uniform(250, 480, n),
     })
     df["pace_sec_per_km"] = df["recent_28d_pace_sec_per_km"] + rng.normal(0, 10, n)
