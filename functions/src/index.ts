@@ -357,3 +357,6 @@ export const finalizeActivity = onCall(
     return { activityId, created: true };
   },
 );
+
+// TRACE Intelligence runs in authenticated, independently scoped callables.
+export { getActivityInsight, generateActivityInsight } from './intelligence';

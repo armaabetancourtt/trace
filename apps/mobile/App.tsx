@@ -8,6 +8,7 @@ import {
 
 import { ActivityScreen } from './src/screens/ActivityScreen';
 import { LiveMapScreen } from './src/screens/LiveMapScreen';
+import { IntelligenceScreen } from './src/screens/IntelligenceScreen';
 import type { ActivityKind } from './src/features/activity/session/ActivitySessionMachine';
 import { bootstrapFirebase } from './src/services/FirebaseBootstrap';
 import { syncAllPendingActivities } from './src/features/sync/syncPendingActivities';
@@ -15,6 +16,7 @@ import { colors } from './src/theme/tokens';
 
 type AppRoute =
   | { name: 'home' }
+  | { name: 'insights' }
   | { name: 'activity'; activityType: ActivityKind };
 
 export default function App() {
@@ -39,10 +41,13 @@ export default function App() {
 
       {route.name === 'home' ? (
         <LiveMapScreen
+          onInsights={() => setRoute({ name: 'insights' })}
           onStart={(activityType) =>
             setRoute({ name: 'activity', activityType })
           }
         />
+      ) : route.name === 'insights' ? (
+        <IntelligenceScreen onBack={() => setRoute({ name: 'home' })} />
       ) : (
         <ActivityScreen
           activityType={route.activityType}

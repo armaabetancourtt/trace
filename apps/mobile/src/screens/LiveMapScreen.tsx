@@ -15,8 +15,10 @@ import { colors } from '../theme/tokens';
 
 export function LiveMapScreen({
   onStart,
+  onInsights,
 }: {
   onStart: (activityType: ActivityKind) => void;
+  onInsights: () => void;
 }) {
   const [activityType, setActivityType] = useState<ActivityKind>('run');
 
@@ -51,8 +53,8 @@ export function LiveMapScreen({
             <TraceButton onPress={() => onStart(activityType)}>
               START
             </TraceButton>
-            <TraceButton tone="secondary" disabled>
-              FIND PEOPLE · SOON
+            <TraceButton tone="secondary" onPress={onInsights}>
+              MY INTELLIGENCE
             </TraceButton>
           </View>
 
@@ -72,7 +74,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.black,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     paddingHorizontal: 20,
   },
   topBar: {
