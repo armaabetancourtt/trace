@@ -43,8 +43,9 @@ To enable the optional model function, explicitly configure the secret and
 model before deployment:
 
     firebase functions:secrets:set OPENAI_API_KEY
-    # Set TRACE_LLM_MODEL as a server runtime environment variable via your
-    # Firebase Functions deployment configuration, never EXPO_PUBLIC_.
+    # In functions/.env (server only, gitignored):
+    TRACE_LLM_MODEL=your-json-capable-model-id
+    # Never use an EXPO_PUBLIC_ key or put provider credentials in the app.
 
 The model function requires this secret binding; without a configured
 provider, leave generation disabled/uninvoked. Deterministic insights never
