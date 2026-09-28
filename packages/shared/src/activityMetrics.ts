@@ -75,7 +75,7 @@ export function computeActivityMetrics(samples: ActivitySample[]): ActivityMetri
   }
 
   const durationSec =
-    Math.max(0, samples.at(-1)!.timestamp - samples[0].timestamp) / 1000;
+    Math.max(0, samples.at(-1)!.timestamp - samples[0]!.timestamp) / 1000;
 
   return {
     durationSec,
