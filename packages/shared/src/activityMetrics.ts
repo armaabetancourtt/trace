@@ -34,13 +34,13 @@ export function computeActivityMetrics(samples: ActivitySample[]): ActivityMetri
   let distanceM = 0;
   let elevationGainM = 0;
   let splitDistanceM = 0;
-  let splitStartTimestamp = samples[0].timestamp;
+  let splitStartTimestamp = samples[0]!.timestamp;
   let nextKilometer = 1;
   const splits: KilometerSplit[] = [];
 
   for (let i = 1; i < samples.length; i += 1) {
-    const previous = samples[i - 1];
-    const current = samples[i];
+    const previous = samples[i - 1]!;
+    const current = samples[i]!;
 
     const segmentM = haversineDistanceM(previous, current);
 
