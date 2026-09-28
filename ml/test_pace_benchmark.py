@@ -11,6 +11,7 @@ def fixture():
     df = pd.DataFrame({
         "user_id": [f"test-{i//6}" for i in range(n)],
         "started_at": pd.date_range("2026-01-01", periods=n, freq="h").astype(str),
+        "feature_window_end_at": (pd.date_range("2026-01-01", periods=n, freq="h") - pd.Timedelta(hours=1)).astype(str),
         "planned_distance_m": rng.uniform(1500, 15000, n),
         "planned_elevation_gain_m": rng.uniform(0, 150, n),
         "recent_28d_pace_sec_per_km": rng.uniform(250, 480, n),
@@ -39,4 +40,13 @@ def test_missing_consent_contract_fails(tmp_path):
     csv = tmp_path / "invalid.csv"
     df.to_csv(csv, index=False)
     with pytest.raises(ValueError, match="Missing columns"):
+        load_consented(csv)
+
+
+def test_future_history_feature_is_rejected(tmp_path):
+    df = fixture()
+    df.loc[0, "feature_window_end_at"] = df.loc[0, "started_at"]
+    csv = tmp_path / "future.csv"
+    df.to_csv(csv, index=False)
+    with pytest.raises(ValueError, match="before run starts"):
         load_consented(csv)
