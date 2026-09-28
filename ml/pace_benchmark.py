@@ -17,8 +17,8 @@ from sklearn.model_selection import GroupShuffleSplit
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-FEATURES = ["distance_m", "elevation_gain_m", "recent_28d_pace_sec_per_km"]
-REQUIRED = ["user_id", "started_at", *FEATURES, "pace_sec_per_km"]
+FEATURES = ["planned_distance_m", "planned_elevation_gain_m", "recent_28d_pace_sec_per_km"]
+REQUIRED = ["user_id", "started_at", "feature_window_end_at", *FEATURES, "pace_sec_per_km"]
 SEED = 42
 
 
@@ -32,13 +32,18 @@ def load_consented(csv: Path) -> tuple[pd.DataFrame, str]:
     if frame["user_id"].isna().any() or frame["user_id"].eq("").any():
         raise ValueError("Missing de-identified user IDs")
     frame["started_at"] = pd.to_datetime(frame["started_at"], utc=True, errors="raise")
+    frame["feature_window_end_at"] = pd.to_datetime(
+        frame["feature_window_end_at"], utc=True, errors="raise"
+    )
+    if (frame["feature_window_end_at"] >= frame["started_at"]).any():
+        raise ValueError("Historical pace feature window must end before run starts")
     for field in [*FEATURES, "pace_sec_per_km"]:
         frame[field] = pd.to_numeric(frame[field], errors="raise")
     if frame.isna().any().any() or not np.isfinite(frame[[*FEATURES, "pace_sec_per_km"]]).all().all():
         raise ValueError("Missing/non-finite values")
-    if (frame[["distance_m", "pace_sec_per_km", "recent_28d_pace_sec_per_km"]] <= 0).any().any():
+    if (frame[["planned_distance_m", "pace_sec_per_km", "recent_28d_pace_sec_per_km"]] <= 0).any().any():
         raise ValueError("Distance and pace values must be positive")
-    if (frame["elevation_gain_m"] < 0).any():
+    if (frame["planned_elevation_gain_m"] < 0).any():
         raise ValueError("Elevation gain must be non-negative")
     if frame["user_id"].nunique() < 10:
         raise ValueError("Need >=10 different consented users for group holdout")
@@ -88,7 +93,7 @@ def evaluate(frame: pd.DataFrame, *, dataset_sha256: str) -> tuple[object, dict]
         predictions = model.predict(test[FEATURES])
     report = {
         "dataset_sha256": dataset_sha256,
-        "data_classification": "external_opt_in_deidentified",
+        "data_classification": "operator_supplied_consent_attestation_unverified",
         "split": "user_disjoint_60_20_20_approx",
         "seed": SEED,
         "features": FEATURES,
@@ -103,7 +108,8 @@ def evaluate(frame: pd.DataFrame, *, dataset_sha256: str) -> tuple[object, dict]
         ))),
         "test_rows": len(test),
         "limitations": [
-            "Previous-28-day pace must be derived from records strictly earlier than started_at.",
+            "Feature window end is checked before each run; upstream historical feature provenance remains operator responsibility.",
+            "Planned route features must not use actual post-run route observations.",
             "Not a clinical, safety, or training recommendation.",
             "Generalization beyond consented runner population not established.",
         ],
