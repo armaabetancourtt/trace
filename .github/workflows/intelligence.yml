@@ -1,0 +1,30 @@
+name: TRACE Intelligence CI
+on:
+  pull_request:
+    paths:
+      - 'functions/**'
+      - 'apps/mobile/**'
+      - 'packages/shared/**'
+      - 'firestore.indexes.json'
+      - '.github/workflows/intelligence.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'functions/**'
+      - 'apps/mobile/**'
+      - 'packages/shared/**'
+      - 'firestore.indexes.json'
+      - '.github/workflows/intelligence.yml'
+permissions:
+  contents: read
+jobs:
+  intelligence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npm run test -w trace-functions
+      - run: npm run typecheck -w @trace/mobile
