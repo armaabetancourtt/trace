@@ -1,3 +1,5 @@
+> **NEW: TRACE Intelligence mobile integration:** [privacy, inference and rollout](docs/INTELLIGENCE.md). An authenticated callable computes a prior-28-day pace baseline from the user's own synced run summaries; the mobile app displays evidence and offers separate opt-in grounded GenAI. The trained sklearn research model remains undeployed; no real-data accuracy is claimed.
+
 <p align="center"><img src="brand/trace-banner.svg" alt="Official TRACE wordmark — MOVE WITH THE CITY" width="100%" /></p>
 
 > **ML engineering evidence · experimental:** [user-disjoint pace benchmark](ml/pace_benchmark.py) · [synthetic fixture tests](ml/test_pace_benchmark.py) · [consent/data contract](ml/README.md). Real held-out performance and app integration remain pending opt-in, de-identified data.
