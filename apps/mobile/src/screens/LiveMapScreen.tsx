@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.black,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     paddingHorizontal: 20,
   },
   topBar: {
