@@ -1,0 +1,2 @@
+# Terraform starter (not deployed)
+Run `terraform fmt -check`, `terraform init`, `terraform validate` in this directory, then inspect `terraform plan -var='project_id=...' -var='bucket_name=globally-unique-name'`. Requires GCP credentials and storage/BigQuery API permissions. Creates a private, versioned GCS bucket and BigQuery dataset. Enforce least-privilege IAM and billing limits externally. No `apply` has been performed.
